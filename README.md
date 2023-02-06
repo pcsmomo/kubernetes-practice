@@ -272,4 +272,12 @@ k delete -f nginx-deployment.yaml
 k delete -f nginx-service.yaml
 ```
 
+## 8. Demo Project: MongoDB and MongoExpress
+
+```sh
+k get all
+# NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+# service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   153m
+```
+
 </details>
