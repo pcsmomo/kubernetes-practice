@@ -57,4 +57,40 @@ Kubernetes tutorials and practices related it
 - etdc: cluster brain
   - cluster changes get stored in the key value store
 
+### 5. Minikube and kubectl - Local Setup
+
+```sh
+# brew install hyperkit
+# hyperkit: The x86_64 architecture is required for this software.
+# > just using docker
+
+# brew install minikube
+# I've already installed minikube from docker app
+
+minikube status
+# minikube
+# type: Control Plane
+# host: Running
+# kubelet: Running
+# apiserver: Running
+# kubeconfig: Configured
+
+minikube version
+# minikube version: v1.29.0
+# commit: ddac20b4b34a9c8c857fc602203b6ba2679794d3
+
+# minikube start --vm-driver=hyperkit
+minikube start --driver=docker
+
+kubectl get nodes
+# NAME       STATUS   ROLES           AGE     VERSION
+# minikube   Ready    control-plane   4m27s   v1.26.1
+
+kubectl version
+kubectl version --short
+# Client Version: v1.26.1
+# Kustomize Version: v4.5.7
+# Server Version: v1.26.1
+```
+
 </details>
