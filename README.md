@@ -54,10 +54,10 @@ Kubernetes tutorials and practices related it
   - which pod should be scheduled next
 - Controller manager
   - detect cluster state changes. e.g pod dies
-- etdc: cluster brain
+- etcd: cluster brain
   - cluster changes get stored in the key value store
 
-### 5. Minikube and kubectl - Local Setup
+## 5. Minikube and kubectl - Local Setup
 
 ```sh
 # brew install hyperkit
@@ -93,7 +93,7 @@ kubectl version --short
 # Server Version: v1.26.1
 ```
 
-### 6. Main Kubectl Commands - K8s CLI
+## 6. Main Kubectl Commands - K8s CLI
 
 ```sh
 alias k
@@ -135,7 +135,7 @@ k get pods
 # nginx-depl-8475696677-ddbnr   1/1     Running       0          50s
 ```
 
-#### Debugging pods
+### Debugging pods
 
 ```sh
 k logs nginx-depl-8475696677-ddbnr
@@ -160,7 +160,7 @@ k exec -it mongo-depl-5ccf565747-jqgrn -- bin/bash
 root@mongo-depl-5ccf565747-jqgrn:/# ls
 ```
 
-#### Delete pods
+### Delete pods
 
 ```sh
 k get deployment
@@ -176,7 +176,7 @@ k get replicaset
 k delete deployment nginx-depl
 ```
 
-#### Custom deployment file
+### Custom deployment file
 
 ```sh
 # ./kubernetes-nana
@@ -194,6 +194,77 @@ k get pods
 # NAME                               READY   STATUS    RESTARTS   AGE
 # nginx-deployment-95585b474-88nnp   1/1     Running   0          8s
 # nginx-deployment-95585b474-z8ljx   1/1     Running   0          61s
+```
+
+## 7. K8s YAML Configuration File
+
+### Each configuration file has 3 parts
+
+1. Metadata
+2. Specification
+   - attributes of "spec" are specific to the "kind"!
+   - `kind: Deployment`
+3. Status
+   - always watching `desired (defined in spec) = actual`
+   - where does k8s get this status data? `etcd`
+
+### template
+
+configuration for pods inside configuration for deployment
+
+- `template: metadata: labels`
+  - it's used for spec
+  - `spec: selector: matchLabel`
+- `deployment.yaml: metadata: labels`
+  - it's used for services
+  - `service.yaml: spec: selector`
+
+### port
+
+`deployment.yaml: containerPort` = `service.yaml: targetPort`
+
+```sh
+k apply -f 01-nginx-deployment.yaml
+k apply -f 01-nginx-service.yaml
+# NAME            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+# kubernetes      ClusterIP   10.96.0.1        <none>        443/TCP   115m
+# nginx-service   ClusterIP   10.102.253.136   <none>        80/TCP    6s
+k describe service nginx-service
+# Name:              nginx-service
+# Namespace:         default
+# Labels:            <none>
+# Annotations:       <none>
+# Selector:          app=nginx
+# Type:              ClusterIP
+# IP Family Policy:  SingleStack
+# IP Families:       IPv4
+# IP:                10.102.253.136
+# IPs:               10.102.253.136
+# Port:              <unset>  80/TCP
+# TargetPort:        8080/TCP
+# Endpoints:         10.244.0.6:8080,10.244.0.7:8080
+# Session Affinity:  None
+# Events:            <none>
+k get pod -o wide
+# NAME                               READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+# nginx-deployment-95585b474-88nnp   1/1     Running   0          49m   10.244.0.7   minikube   <none>           <none>
+# nginx-deployment-95585b474-z8ljx   1/1     Running   0          50m   10.244.0.6   minikube   <none>           <none>
+```
+
+### Check the result of deployment (useful for debugging)
+
+```sh
+# check if the status has changed
+k get deployment nginx-deployment -o yaml
+k get deployment nginx-deployment -o yaml > 01-nginx-deployment-result.yaml
+```
+
+> Tip❕\
+> If you want to copy from the automated yaml file, you will have to remove most of generated stuff and create from it
+
+```sh
+k delete -f 01-nginx-deployment.yaml
+k delete -f 01-nginx-service.yaml
 ```
 
 </details>
