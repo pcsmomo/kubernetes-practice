@@ -179,16 +179,17 @@ k delete deployment nginx-depl
 ### Custom deployment file
 
 ```sh
-# ./kubernetes-nana
-touch 01-nginx-deployment.yaml
-k apply -f 01-nginx-deployment.yaml
+# ./kubernetes-nana/01-nginx
+
+touch nginx-deployment.yaml
+k apply -f nginx-deployment.yaml
 # deployment.apps/nginx-deployment created
 k get pods
 # NAME                               READY   STATUS    RESTARTS   AGE
 # nginx-deployment-95585b474-z8ljx   1/1     Running   0          33s
 
 # change replicas to 2
-apply -f 01-nginx-deployment.yaml
+apply -f nginx-deployment.yaml
 # deployment.apps/nginx-deployment configured
 k get pods
 # NAME                               READY   STATUS    RESTARTS   AGE
@@ -224,8 +225,10 @@ configuration for pods inside configuration for deployment
 `deployment.yaml: containerPort` = `service.yaml: targetPort`
 
 ```sh
-k apply -f 01-nginx-deployment.yaml
-k apply -f 01-nginx-service.yaml
+# ./kubernetes-nana/01-nginx
+
+k apply -f nginx-deployment.yaml
+k apply -f nginx-service.yaml
 # NAME            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
 # kubernetes      ClusterIP   10.96.0.1        <none>        443/TCP   115m
 # nginx-service   ClusterIP   10.102.253.136   <none>        80/TCP    6s
@@ -256,15 +259,17 @@ k get pod -o wide
 ```sh
 # check if the status has changed
 k get deployment nginx-deployment -o yaml
-k get deployment nginx-deployment -o yaml > 01-nginx-deployment-result.yaml
+k get deployment nginx-deployment -o yaml > nginx-deployment-result.yaml
 ```
 
 > Tip❕\
 > If you want to copy from the automated yaml file, you will have to remove most of generated stuff and create from it
 
 ```sh
-k delete -f 01-nginx-deployment.yaml
-k delete -f 01-nginx-service.yaml
+# ./kubernetes-nana/01-nginx
+
+k delete -f nginx-deployment.yaml
+k delete -f nginx-service.yaml
 ```
 
 </details>
