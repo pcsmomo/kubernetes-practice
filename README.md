@@ -384,4 +384,42 @@ k logs mongo-express-5bcd46fcff-dl6x6
 # basicAuth credentials are "admin:pass", it is recommended you change this in your config.js!
 ```
 
+### Make it an External Service
+
+- [Kubernetes Services - Type LoadBalancer](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer)
+- nodePort
+  - Port for external IP address
+  - Must be between 30000 - 32767
+
+```sh
+k apply -f mongo-express.yaml
+# deployment.apps/mongo-express unchanged
+# service/mongo-express-service created
+
+k get services
+# NAME                    TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+# kubernetes              ClusterIP      10.96.0.1        <none>        443/TCP          4h7m
+# mongo-express-service   LoadBalancer   10.104.125.184   <pending>     8081:30000/TCP   5s
+# mongodb-service         ClusterIP      10.109.5.44      <none>        27017/TCP        68m
+
+# mongo-express-service is pending
+# because minikube will allocate it when service is open below
+minikube service mongo-express-service
+# |-----------|-----------------------|-------------|---------------------------|
+# | NAMESPACE |         NAME          | TARGET PORT |            URL            |
+# |-----------|-----------------------|-------------|---------------------------|
+# | default   | mongo-express-service |        8081 | http://192.168.49.2:30000 |
+# |-----------|-----------------------|-------------|---------------------------|
+# 🏃  Starting tunnel for service mongo-express-service.
+# |-----------|-----------------------|-------------|------------------------|
+# | NAMESPACE |         NAME          | TARGET PORT |          URL           |
+# |-----------|-----------------------|-------------|------------------------|
+# | default   | mongo-express-service |             | http://127.0.0.1:51712 |
+# |-----------|-----------------------|-------------|------------------------|
+# 🎉  Opening service default/mongo-express-service in default browser...
+# ❗  Because you are using a Docker driver on darwin, the terminal needs to be open to run it.
+```
+
+Navigate `http://127.0.0.1:51712`
+
 </details>
