@@ -354,4 +354,8 @@ k get all | grep mongodb
 # replicaset.apps/mongodb-deployment-5d966bd9d6   1         1         1       8m26s
 ```
 
+### Mongo-express Deployment
+
+[mongo-express docker hub](https://hub.docker.com/_/mongo-express)
+
 </details>
