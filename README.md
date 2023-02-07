@@ -358,4 +358,30 @@ k get all | grep mongodb
 
 [mongo-express docker hub](https://hub.docker.com/_/mongo-express)
 
+### Create Configmap
+
+[Kubernetes ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/)
+
+```sh
+k apply -f mongo-configmap.yaml
+# configmap/mongodb-configmap created
+k apply -f mongo-express.yaml
+# deployment.apps/mongo-express created
+
+k get pods
+# NAME                                  READY   STATUS    RESTARTS   AGE
+# mongo-express-5bcd46fcff-dl6x6        1/1     Running   0          102s
+# mongodb-deployment-5d966bd9d6-29g5w   1/1     Running   0          42m
+
+k logs mongo-express-5bcd46fcff-dl6x6
+# Welcome to mongo-express
+# ------------------------
+
+
+# (node:7) [MONGODB DRIVER] Warning: Current Server Discovery and Monitoring engine is deprecated, and will be removed in a future version. To use the new Server Discover and Monitoring engine, pass option { useUnifiedTopology: true } to the MongoClient constructor.
+# Mongo Express server listening at http://0.0.0.0:8081
+# Server is open to allow connections from anyone (0.0.0.0)
+# basicAuth credentials are "admin:pass", it is recommended you change this in your config.js!
+```
+
 </details>
