@@ -280,4 +280,53 @@ k get all
 # service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   153m
 ```
 
+### Create Secret
+
+- [Kubernetes Secrets](https://kubernetes.io/docs/concepts/configuration/secret/#use-cases)
+- [Kubernetes Secrets - Types of Secret](https://kubernetes.io/docs/concepts/configuration/secret/#secret-types)
+
+1. Generate encoded strings
+
+```sh
+# generate encoded string
+echo -n 'username' | base64
+# dXNlcm5hbWU=
+echo -n 'password' | base64
+# cGFzc3dvcmQ=
+```
+
+2. Apply secret
+   > Run secret before using deployment or any others
+
+```sh
+k apply -f mongo-secret.yaml
+k get secret
+# NAME             TYPE     DATA   AGE
+# mongodb-secret   Opaque   2      18s
+```
+
+3. Apply deployment
+
+```sh
+k apply -f mongo.yaml
+k get all
+# NAME                                      READY   STATUS              RESTARTS   AGE
+# pod/mongodb-deployment-5d966bd9d6-29g5w   0/1     ContainerCreating   0          4s
+
+# NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+# service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   172m
+
+# NAME                                 READY   UP-TO-DATE   AVAILABLE   AGE
+# deployment.apps/mongodb-deployment   0/1     1            0           4s
+
+# NAME                                            DESIRED   CURRENT   READY   AGE
+# replicaset.apps/mongodb-deployment-5d966bd9d6   1         1         0       4s
+
+k get pod --watch
+# NAME                                  READY   STATUS    RESTARTS   AGE
+# mongodb-deployment-5d966bd9d6-29g5w   1/1     Running   0          27s
+
+k describe pod mongodb-deployment-5d966bd9d6-29g5w
+```
+
 </details>

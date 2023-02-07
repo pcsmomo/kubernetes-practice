@@ -36,6 +36,8 @@
 
 `kubectl get pods -o wide`
 
+`kubectl get pod --watch`
+
 `kubectl get services`
 
 `kubectl create deployment nginx-depl --image=nginx`
