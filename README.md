@@ -215,10 +215,9 @@ configuration for pods inside configuration for deployment
 
 - `template: metadata: labels`
   - it's used for spec
-  - `spec: selector: matchLabel`
-- `deployment.yaml: metadata: labels`
-  - it's used for services
-  - `service.yaml: spec: selector`
+    - `spec: selector: matchLabel`
+  - it's also used for services
+    - `service.yaml: spec: selector`
 
 ### port
 
@@ -327,6 +326,32 @@ k get pod --watch
 # mongodb-deployment-5d966bd9d6-29g5w   1/1     Running   0          27s
 
 k describe pod mongodb-deployment-5d966bd9d6-29g5w
+```
+
+### Create Service
+
+```sh
+k apply -f mongo.yaml
+# deployment.apps/mongodb-deployment unchanged
+# service/mongodb-service created
+
+# Check them out
+k get service
+# NAME              TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)     AGE
+# kubernetes        ClusterIP   10.96.0.1     <none>        443/TCP     179m
+# mongodb-service   ClusterIP   10.109.5.44   <none>        27017/TCP   23s
+
+k describe service mongodb-service
+# Endpoints:         10.244.0.8:27017
+k get pod -o wide
+# NAME                                  READY   STATUS    RESTARTS   AGE     IP           NODE       NOMINATED NODE   READINESS GATES
+# mongodb-deployment-5d966bd9d6-29g5w   1/1     Running   0          7m42s   10.244.0.8   minikube   <none>           <none>
+k get all
+k get all | grep mongodb
+# pod/mongodb-deployment-5d966bd9d6-29g5w   1/1     Running   0          8m26s
+# service/mongodb-service   ClusterIP   10.109.5.44   <none>        27017/TCP   118s
+# deployment.apps/mongodb-deployment   1/1     1            1           8m26s
+# replicaset.apps/mongodb-deployment-5d966bd9d6   1         1         1       8m26s
 ```
 
 </details>
