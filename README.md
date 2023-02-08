@@ -422,4 +422,149 @@ minikube service mongo-express-service
 
 Navigate `http://127.0.0.1:51712`
 
+### Reset all
+
+```sh
+k delete -f mongo-express.yaml
+k delete -f mongo.yaml
+k delete -f mongo-configmap.yaml
+k delete -f mongo-secret.yaml
+```
+
+## 9. Organizing your components with K8s Namespaces
+
+```sh
+k get namespaces
+# NAME                   STATUS   AGE
+# default                Active   34h
+# kube-node-lease        Active   34h
+# kube-public            Active   34h
+# kube-system            Active   34h
+# kubernetes-dashboard   Active   30h
+
+kubens
+# default
+# kube-node-lease
+# kube-public
+# kube-system
+```
+
+- kube-system
+  - Do NOT create or modify in kube-system
+  - System processes
+  - Master and Kubectl processes
+- kube-public
+  - publicely accesible data
+  - A configmap, which contains cluster information
+    ```sh
+    kubectl cluster-info
+    # Kubernetes control plane is running at https://127.0.0.1:59700
+    # CoreDNS is running at https://127.0.0.1:59700/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+    ```
+- kube-node-lease
+  - hearbeats of nodes
+  - each node has associated lease object in namespace
+  - determins **the availability of a node**
+- default
+  - resources you create are located here
+  - before you create new name spaces
+    ```sh
+    kubectl create namespace my-namespace
+    kubectl get namespace
+    ```
+- kubernetes-dashboard
+
+> However, it'd be better to create a namespace with a configuration file (`kind: ConfigMap`)\
+> As it has history
+
+### Why use namespaces?
+
+1. Resources grouped in Namespaces
+   - Database
+   - Monitoring
+   - Elastic Stack
+   - Nginx-Ingress
+2. Conflicts: Many teams, same application
+   - specnetes
+   - imagenates
+   - scattering
+   - and so on..
+3. Resource Sharing
+   - Staging and Development
+   - Blue/Green Development
+4. Access and Resource Limits on Namespace
+   - Project A Namespace
+     - Limit: CPU, RAM, Storage per namespace
+   - Project B Namespace
+
+### usecase
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-configmap
+  namespace: my-namespace
+data:
+  db_url: mysql-service.database
+```
+
+### Components, which can't be created within a Namespace
+
+- live globally in a cluster
+- you can't isolate them
+
+```sh
+kubelctl api-resources --namespaced=false
+kubelctl api-resources --namespaced=true
+```
+
+### Create component in a Namespace
+
+```sh
+kubectl create namespace my-namespace
+k apply -f mysql-configmap.yaml
+k get configmap
+# NAME               DATA   AGE
+# kube-root-ca.crt   1      47h
+k get configmap -n default
+
+k get configmap -n my-namespace
+# NAME               DATA   AGE
+# kube-root-ca.crt   1      61s
+# mysql-configmap    1      50s
+
+k get all -n my-namespace
+# No resources found in my-namespace namespace.
+
+# k apply -f mysql-configmap.yaml --namespace=my-namespace
+```
+
+### Change active namespace
+
+kubens
+
+```sh
+brew install kubens
+kubens
+# default
+# kube-node-lease
+# kube-public
+# kube-system
+# kubernetes-dashboard
+# my-namespace
+
+# change the default namespace to my-namespace
+kubens my-namespace
+# Context "minikube" modified.
+# Active namespace is "my-namespace".
+```
+
+### Clean up
+
+```sh
+k delete -f mysql-configmap.yaml
+k delete namespace my-namespace
+```
+
 </details>
