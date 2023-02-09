@@ -567,4 +567,129 @@ k delete -f mysql-configmap.yaml
 k delete namespace my-namespace
 ```
 
+## 10. K8s Ingress explained
+
+- [Ingress Controllser](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
+- Ingress Controller Pod: Extra pod to handle
+  - evaluates all the rules
+  - manages redirections
+  - endtrypoint to cluster
+  - many third-party implementations
+
+### Proxy server
+
+- pointing to Ingress Controller Pod
+- separate server
+- public ID Address and open ports
+- entrypoint to cluster
+
+### Install Ingress
+
+```sh
+# No need to install manually anymore
+minikube addons enable ingress
+# 💡  ingress is an addon maintained by Kubernetes. For any concerns contact minikube on GitHub.
+# You can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS
+# 💡  After the addon is enabled, please run "minikube tunnel" and your ingress resources would be available at "127.0.0.1"
+#     ▪ Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20220916-gd32f8c343
+#     ▪ Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20220916-gd32f8c343
+#     ▪ Using image registry.k8s.io/ingress-nginx/controller:v1.5.1
+# 🔎  Verifying ingress addon...
+# 🌟  The 'ingress' addon is enabled
+
+# Optional?
+minikube tunnel
+# ✅  Tunnel successfully started
+# 📌  NOTE: Please do not close this terminal as this process must stay alive for the tunnel to be accessible ...
+
+
+k get pod -n kube-system
+# ingress is not here.
+
+k get ns
+# NAME                   STATUS   AGE
+# default                Active   3d
+# ingress-nginx          Active   4m28s
+# kube-node-lease        Active   3d
+# kube-public            Active   3d
+# kube-system            Active   3d
+# kubernetes-dashboard   Active   2d20h
+
+k get pod -n ingress-nginx
+# NAME                                       READY   STATUS      RESTARTS   AGE
+# ingress-nginx-admission-create-rhr7d       0/1     Completed   0          5m8s
+# ingress-nginx-admission-patch-nrd6x        0/1     Completed   0          5m8s
+# ingress-nginx-controller-77669ff58-4xvfr   1/1     Running     0          5m8s
+```
+
+### Create Ingress rule
+
+Make `kubernetes-dashboard` accessible
+
+```sh
+k get all -n kubernetes-dashboard
+# NAME                                            READY   STATUS    RESTARTS      AGE
+# pod/dashboard-metrics-scraper-5c6664855-xmxdp   1/1     Running   1 (39h ago)   2d20h
+# pod/kubernetes-dashboard-55c4cbbc7c-vstxh       1/1     Running   2 (39h ago)   2d20h
+
+# NAME                                TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)    AGE
+# service/dashboard-metrics-scraper   ClusterIP   10.101.19.251    <none>        8000/TCP   2d20h
+# service/kubernetes-dashboard        ClusterIP   10.111.178.191   <none>        80/TCP     2d20h
+
+# NAME                                        READY   UP-TO-DATE   AVAILABLE   AGE
+# deployment.apps/dashboard-metrics-scraper   1/1     1            1           2d20h
+# deployment.apps/kubernetes-dashboard        1/1     1            1           2d20h
+
+# NAME                                                  DESIRED   CURRENT   READY   AGE
+# replicaset.apps/dashboard-metrics-scraper-5c6664855   1         1         1       2d20h
+# replicaset.apps/kubernetes-dashboard-55c4cbbc7c       1         1         1       2d20h
+```
+
+```sh
+# kubernetes-nana/04-ingress
+k apply -f dashboard-ingress.yaml
+# ingress.networking.k8s.io/dashboard-ingress created
+
+k get ingress -n kubernetes-dashboard
+# NAME                CLASS    HOSTS           ADDRESS   PORTS   AGE
+# dashboard-ingress   <none>   dashboard.com             80      43s
+k get ingress -n kubernetes-dashboard --watch
+# NAME                CLASS    HOSTS           ADDRESS        PORTS   AGE
+# dashboard-ingress   <none>   dashboard.com   192.168.49.2   80      57s
+
+sudo vim /etc/hosts
+# 192.168.49.2 dashboard.com
+```
+
+Navigate `http://dashboard.com` -> Not working for me..
+
+```sh
+k describe ingress dashboard-ingress -n kubernetes-dashboard
+# Name:             dashboard-ingress
+# Labels:           <none>
+# Namespace:        kubernetes-dashboard
+# Address:          192.168.49.2
+# Ingress Class:    <none>
+# Default backend:  <default>
+# Rules:
+#   Host           Path  Backends
+#   ----           ----  --------
+#   dashboard.com
+#                  /   kubernetes-dashboard:80 (10.244.0.17:9090)
+# Annotations:     <none>
+# Events:
+#   Type    Reason  Age                From                      Message
+#   ----    ------  ----               ----                      -------
+#   Normal  Sync    97s (x3 over 11m)  nginx-ingress-controller  Scheduled for sync
+```
+
+> So with ingress, you can figure multiple services in the same domain\
+> but subdomain by adding `- path` under `paths`\
+> or different paths by adding new `- host: analytics.myapp.com` under `rules`
+
+### Configuring TLS Certificate - https://
+
+- [myapp-ingress-tls.yaml](./kubernetes-nana/04-ingress/myapp-ingress-tls.yaml)
+- [myapp-secret.yaml](./kubernetes-nana/04-ingress/myapp-secret.yaml)
+
 </details>
