@@ -1,0 +1,6 @@
+name: my-app
+container:
+  name: my-app-container
+  image: my-app-image
+  port: 9001
+  version: 1.0.0

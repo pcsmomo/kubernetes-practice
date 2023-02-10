@@ -692,4 +692,85 @@ k describe ingress dashboard-ingress -n kubernetes-dashboard
 - [myapp-ingress-tls.yaml](./kubernetes-nana/04-ingress/myapp-ingress-tls.yaml)
 - [myapp-secret.yaml](./kubernetes-nana/04-ingress/myapp-secret.yaml)
 
+## 11. Helm - Package Manager
+
+[Heml](https://helm.sh/docs/intro/install/)
+
+- Package Manager for Kubernetes
+- To package YAML files and distribute them in public and private repositories
+
+### Helm Charts
+
+- Bundle of YAML files
+- Create your own Helm Charts with Helm
+- Push them to Helm Repository
+- Download and use existing ones
+
+[Promotheus - an open-source systems monitoring](https://prometheus.io/docs/introduction/overview/)
+
+### Sharing Helm Charts
+
+```sh
+helm search <keyword>
+```
+
+[Artifact Hub - Helm Chart Hub?](https://artifacthub.io/)
+
+### Template Engine
+
+1. Define a common blueprint
+2. Dynamic values are replaced by placeholders
+
+- [example.template.yaml](./kubernetes-nana/05-helm/example-template.yaml)
+- [values.yaml](./kubernetes-nana/05-helm/values.yaml)
+
+#### Usecase
+
+- Same structure of cluster
+  - mex, xas, Etc.
+- Same application accross different environments
+  - dev, stage, prod, Etc.
+
+### Helm Chart Structure
+
+```
+mychart/
+  Chart.yaml
+  values.yaml
+  charts/
+  templates/
+```
+
+- Top level `mychart` folder: name of chart
+- `Chart.yaml`: meta info about chart
+- `values.yaml`: values for the template files
+- `charts` folder: chart dependencies
+- `templates` folder: the actual template files
+
+```sh
+heml install <chartname>
+```
+
+### value injection into template files
+
+```sh
+helm install --values=my-values.yaml <chartname>
+# or
+helm install --set version=2.0.0
+```
+
+### Release Management
+
+- Helm v2
+  - Heml CLI sends requests to `Tiller`
+    `heml install <chartname>`
+    `heml upgrade <chartname>`
+    - changes are applied to existing deployment instead of creating a new one
+    - Handling rollbacks
+  - Downsides of Tiller
+    - `Tiller` has too much power inside of K8s cluster
+    - Security issue
+- Helm v3
+  - `Tiller` got removed
+
 </details>
