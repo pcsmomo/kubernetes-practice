@@ -812,4 +812,14 @@ Application has to claim the Persistent Volume
 - **external** provision
 - configure **parameters** for storage we want to request for PV
 
+## 13. Deploying Stateful Apps with StatefulSet
+
+### Deployment vs StatefulSet
+
+- replicating stateful applications is more difficult
+- other requirements
+
+> Stateful applications not perfect for containerized environments \
+> -> Stateless applications
+
 </details>
