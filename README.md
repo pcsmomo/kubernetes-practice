@@ -822,4 +822,75 @@ Application has to claim the Persistent Volume
 > Stateful applications not perfect for containerized environments \
 > -> Stateless applications
 
+## 14. K8s Services explained
+
+### What is a Service and when we need it?
+
+- Each Pod has its own IP address
+  - ❌ Pods are ephemeral - are detroyed frequently!
+- Service:
+  - ✅ Stable IP Address
+  - ✅ Loadbalancing
+  - ✅ loose coupling
+  - ✅ within & outside cluster
+
+### Service Types
+
+- ClusterIP
+  - default type
+- LoadBalancer
+- NodePort
+
+### Service Communication: selector
+
+- Pods are identified via selectors
+- key-value pairs
+- labels of pods
+- random label names
+
+### Service Endpoints
+
+- dynamic
+
+### Service Communication: port vs targetPort
+
+- port: arbitary
+- targetPort
+
+### Headless Services
+
+- Client wants to communicate with 1 specific Pod directly
+- Pods want to talk directly with specific Pod
+- so, not randomly selected
+- Use Case: Stateful applications
+
+#### Client seends to figure out IP addresses of each Pod
+
+- Option 1: API call to K8s API Server?
+  - ❌ makes app too tied to K8s API
+  - ❌ inefficient
+- Option 2: DNS Lookup
+  - DNS Lookup for Service - returns single IP address (Cluster IP)
+  - Set ClusterIP to "None" - returns Pod IP address instead ✅
+    ```yaml
+    spec:
+      clusterIP: None
+    ```
+
+### NodePort Services
+
+- External traffic has acces to fixed port on each Worker Node
+- range of nodePort : 30000 - 32767
+
+> NodePort Service NOT for external connection!\
+> It's for testing or temporarily
+
+### LoadBalancer Services
+
+- Becoms accessible externally through **cloud providers LoadBalancer**
+
+> This is the way to go for external connection
+
+### Wrap up
+
 </details>
