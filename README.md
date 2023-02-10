@@ -773,4 +773,43 @@ helm install --set version=2.0.0
 - Helm v3
   - `Tiller` got removed
 
+## 12. Persisting Data in K8s with Volumes
+
+- Persistent Volumn (pv)
+- Persistent Volume Claim (pvc)
+- Storage Class (sc)
+
+### Persistent Volume
+
+- [persistent-volumes.yaml](./kubernetes-nana/06-volume/persistent-volumes.yaml)
+- [pods-with-volume.yaml](./kubernetes-nana/06-volume/pods-with-volume.yaml)
+
+- a cluster resource
+- created via YAML file
+  - `kind PersistentVolume`
+  - spec: e.g. how much storage
+
+> Persistent Volumes are NOT namespaced
+
+### Local vs Remote Volume Types
+
+### Persistent Volume Claim
+
+- [persistent-volume-claims.yaml](./kubernetes-nana/06-volume/persistent-volume-claims.yaml)
+- [deployment-with-multiple-volumes.yaml](./kubernetes-nana/06-volume/deployment-with-multiple-volumes.yaml)
+
+Application has to claim the Persistent Volume
+
+`pvc` is a kind of broker between `pod` and (`pv` or `sc`)
+
+### Storage class
+
+[storage-class.yaml](./kubernetes-nana/06-volume/storage-class.yaml)
+
+- via `provisioner`
+- each storage backend has own provisioner
+- **internal** provisional - "kubernetes.io"
+- **external** provision
+- configure **parameters** for storage we want to request for PV
+
 </details>
