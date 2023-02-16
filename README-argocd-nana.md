@@ -95,4 +95,36 @@ Reverse the flow
    - source : git repository
    - destination: k8s cluster
 
+## 12. Multiple Clusters with ArgoCD
+
+1. git branch for each environment
+2. using overlays with kustomize
+   - ./myapp-cluster
+     - base
+       - deployment.yaml
+       - kustomization.yaml
+       - rbac.yaml
+       - service.yaml
+     - overlays
+       - development
+         - kustomization.yaml
+       - staging
+         - kustomization.yaml
+       - production
+         - kustomization.yaml
+
+## 14. Demo Setup & Overview
+
+1. Install ArgoCD in K8s cluster
+2. Configure ArgoCD with "Application" CRD
+3. Test our setup by updating `Deployment.yaml` file
+
+```sh
+minikube status
+```
+
+- base image: https://hub.docker.com/r/nanajanashia/argocd-app/tags
+- git lab repo: https://gitlab.com/nanuchi/argocd-app-config
+- We are going to start from tag 1.0 and will update the tag versions
+
 </details>
