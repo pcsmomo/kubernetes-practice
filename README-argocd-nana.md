@@ -74,4 +74,25 @@ Reverse the flow
 - Helm Charts
 - Kustomize
 
+## 5. Benefits of using GitOps with ArgoCD
+
+- Git as Single Source of Truth
+- Easy Rollback
+- Cluster Disaster Recovery
+
+## 10. ArgoCD as Kubernetes Extension
+
+- ArgoCD uses existing K8s functionalities
+  - E.G. using etcd to store data
+  - E.G. using K8s controllers for monitoring and comparing actual and desired state
+
+## 11. How to configure ArgoCD?
+
+1. Deploy ArgoCD into K8s cluster
+   - extends the K8s API with Custom Resource Definition (crd)
+2. Configure ArgoCD with K8s YAML file
+   - main resource is `kind: Application`
+   - source : git repository
+   - destination: k8s cluster
+
 </details>
