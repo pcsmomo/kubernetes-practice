@@ -127,4 +127,105 @@ minikube status
 - git lab repo: https://gitlab.com/nanuchi/argocd-app-config
 - We are going to start from tag 1.0 and will update the tag versions
 
+## 15. Beginning of Hands-On Demo
+
+### Install ArgoCD
+
+```sh
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/core-install.yaml
+```
+
+### Access Argocd UI
+
+```sh
+kubectl get svc -n argocd
+kubectl port-forward -n argocd svc/argocd-server 8080:443
+# Forwarding from 127.0.0.1:8080 -> 8080
+# Forwarding from [::1]:8080 -> 8080
+```
+
+Navigate the Argocd Dashboard, https://127.0.0.1:8080
+
+- id: admin
+- password
+  - [Login Using the CLI](https://argo-cd.readthedocs.io/en/stable/getting_started/#4-login-using-the-cli)
+  - Or follow the lecture
+    ```sh
+    kubectl get secret argocd-initial-admin-secret -n argocd -o yaml
+    echo <password> | base64 --decode
+    ```
+
+### Set up the application config
+
+[Argocd Declarative Setup](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications)
+
+- ```yaml
+  source:
+    repoURL: https://gitlab.com/nanuchi/argocd-app-config.git
+    targetRevision: HEAD
+    path: dev
+  ```
+- `kubectl get svc`
+  ```yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: myapp
+  ```
+- if `myapp` namespace doesn't exist, create one
+  ```yaml
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  ```
+- [ArgoCD Automated sync policy](https://argo-cd.readthedocs.io/en/stable/user-guide/auto_sync/#automated-sync-policy)
+  ```yaml
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+  ```
+  - Why are these turned off by default?
+    - Safety Mechanism
+
+#### Polling policy
+
+- As default, ArgoCD polls Git repository every 3 minutes
+- If you don't want this delay, you can configure a Git webghook
+
+### Apply configuration
+
+Push all changes to the repo that we configured
+
+```sh
+kubectl apply -f application.yaml
+```
+
+### Check the synced Git projec5
+
+- Navigate the Argocd Dashboard, https://127.0.0.1:8080
+- myapp-argo-application
+  - summary tab and manifest tab
+
+### Test Auto Sync
+
+- Change the image tag number in `dev/deployment.yaml` from 1.0 to 1.2 on the git repo
+  - ArgoCD will automatically notice the changes and apply it to the kubernetes cluster
+- Change metadata name from `myapp-deployment` to `myapp` in `dev/deployment.yaml`
+
+### Change the cluster directly
+
+```sh
+kubectl edit deployment -n myapp myapp
+# change replicas from 2 to 4
+```
+
+- 2 more pods will be created but soon ArgoCD will remove 2 pods \
+  as the replicas was set to 2 in the git repo
+
+### Manually Sync
+
+1. Refresh: Compare the latest code in Git with the live state
+2. Sync: Move target state, by actually applying the changes to the K8s cluster
+
 </details>
